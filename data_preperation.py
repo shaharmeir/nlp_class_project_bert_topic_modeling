@@ -1,9 +1,10 @@
+from collections import Counter
 from typing import Union
 import pickle
 import pandas as pd
 from config import IS_ETHICAL_COLUMN, WHY_NOT_ETHICAL_TEXT_COLUMN, WHY_NOT_ETHICAL_CLEAN_TEXT_COLUMN, \
     WHY_NOT_ETHICAL_CLEAN_WORD_COUNT_COLUMN, RISK_1_COLUMN, MIN_WORDS_TO_KEEP, MAX_WORDS_TO_KEEP, EMBEDDING_COLUMN, \
-    ORIGINAL_EXCEL_PATH, OUTPUT_WITH_EMBEDDING_PICKLE_PATH
+    ORIGINAL_EXCEL_PATH, OUTPUT_WITH_EMBEDDING_PICKLE_PATH, MIN_REASON_COUNT_TO_KEEP
 from bert_embedding import get_text_embedding
 
 pd.options.mode.chained_assignment = None
@@ -32,8 +33,18 @@ def fix_df(df: pd.DataFrame) -> pd.DataFrame:
     df[RISK_1_COLUMN] = df.apply(lambda row: clean_text(row[RISK_1_COLUMN], to_lower=True), axis=1)
     # todo: עדיין יש חוסר אחידות בסוגי הסיכונים שהם תייגו אז שווה אולי לאחד ידנית על בסיס מיפוי שנעשה
     # todo: אולי שווה גם להסתכל על Risk 2 למרות שאין שם הרבה
-    # todo: לנסות להשאיר רק את הדאטה שאנחנו יודעים ששיך לקלאסטרים האמיתיים הגדולים אם לא רואים תוצאות בקלות, ראיתי תוצאות לא רעות על 2 העיקריים
+
     return df
+
+
+def _leave_only_main_risks(df):
+    relevant_df = df[[WHY_NOT_ETHICAL_CLEAN_TEXT_COLUMN, RISK_1_COLUMN, EMBEDDING_COLUMN]]
+    risk_reason_to_count_mapping = dict(Counter(relevant_df[RISK_1_COLUMN]))
+    relevant_risk_reasons = [risk_reason for risk_reason, count in risk_reason_to_count_mapping.items() if
+                             count >= MIN_REASON_COUNT_TO_KEEP]
+    relevant_df = relevant_df[relevant_df[RISK_1_COLUMN].isin(
+        relevant_risk_reasons)]  # todo: maybe we can fix some of those risk reasons to be in the top reasons
+    return relevant_df
 
 
 def read_excel_df(df_path: str) -> pd.DataFrame:
