@@ -8,5 +8,7 @@ EMBEDDING_COLUMN = "embedding"
 MIN_WORDS_TO_KEEP = 5
 MAX_WORDS_TO_KEEP = 50
 
+MIN_REASON_COUNT_TO_KEEP = 30
+
 ORIGINAL_EXCEL_PATH = "/home/amit/Downloads/nlp_project_topic_modeling.xlsx"
 OUTPUT_WITH_EMBEDDING_PICKLE_PATH = "/home/amit/Downloads/nlp_project_topic_modeling.pkl"

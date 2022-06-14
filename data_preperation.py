@@ -64,3 +64,4 @@ if __name__ == "__main__":
         pickle.dump(topic_modeling_df, f)
     # topic_modeling_df.to_parquet(OUTPUT_WITH_EMBEDDING_PICKLE_PATH)
     # todo: maybe remove popular words i dont want to appear in clusters
+    # todo: try spelling correction since many why not ethical texts are misspelled
